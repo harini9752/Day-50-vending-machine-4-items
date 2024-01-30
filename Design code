@@ -1,0 +1,57 @@
+module vending_machine (
+  input wire clk,
+  input wire [1:0] selection,
+  input wire [3:0] inserted_amount,
+  output reg item_dispensed
+);
+
+  parameter PRICE_A = 3;
+  parameter PRICE_B = 5;
+  parameter PRICE_C = 2;
+  parameter PRICE_D = 4;
+
+  reg [3:0] item_price;
+  reg [3:0] remaining_amount;
+  reg [1:0] state;
+
+  localparam IDLE = 2'b00;
+  localparam SELECT_ITEM = 2'b01;
+  localparam DISPENSE_ITEM = 2'b10;
+
+  always @(posedge clk) begin
+    case (state)
+      IDLE: begin
+        item_dispensed = 0;
+        if (selection != 2'b00) begin
+          item_price <= (selection == 2'b01) ? PRICE_A :
+                        (selection == 2'b10) ? PRICE_B :
+                        (selection == 2'b11) ? PRICE_C :
+                                               PRICE_D;
+          remaining_amount <= inserted_amount;
+          state <= SELECT_ITEM;
+        end
+      end
+
+      SELECT_ITEM: begin
+        if (remaining_amount >= item_price) begin
+          remaining_amount <= remaining_amount - item_price;
+          state <= DISPENSE_ITEM;
+        end else begin
+          item_dispensed = 0;
+          state <= IDLE;
+        end
+      end
+
+      DISPENSE_ITEM: begin
+        item_dispensed = 1;
+        state <= IDLE;
+      end
+    endcase
+  end
+
+endmodule
+
+module tb_vending_machine;
+
+  reg clk;
+  reg [
