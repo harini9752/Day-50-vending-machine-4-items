@@ -1,0 +1,37 @@
+module tb_vending_machine;
+
+  reg clk;
+  reg [1:0] selection;
+  reg [3:0] inserted_amount;
+  wire item_dispensed;
+
+  vending_machine uut (
+    .clk(clk),
+    .selection(selection),
+    .inserted_amount(inserted_amount),
+    .item_dispensed(item_dispensed)
+  );
+
+  initial begin
+    clk = 0;
+    selection = 2'b00;
+    inserted_amount = 0;
+
+    #10 inserted_amount = 3;
+    selection = 2'b01;
+    #10 $display("Time=%0t Selection=%b InsertedAmount=%d ItemDispensed=%b", $time, selection, inserted_amount, item_dispensed);
+
+    inserted_amount = 4;
+    selection = 2'b10;
+    #10 $display("Time=%0t Selection=%b InsertedAmount=%d ItemDispensed=%b", $time, selection, inserted_amount, item_dispensed);
+
+    inserted_amount = 2;
+    selection = 2'b11;
+    #10 $display("Time=%0t Selection=%b InsertedAmount=%d ItemDispensed=%b", $time, selection, inserted_amount, item_dispensed);
+
+    $finish;
+  end
+
+  always #5 clk = ~clk;
+
+endmodule
